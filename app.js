@@ -1,15 +1,32 @@
 //"type": "module", in package.json allows es6 modules syntax
 import express from 'express';
-import fs from 'fs';
+import morgan from 'morgan';
+import path from 'path';
+// routers
+import usersRouter from './routes/userRoutes.js';
+import toursRouter from './routes/tourRoutes.js';
+import 'dotenv/config';
 
 const app = express();
+// middleware
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
+app.use(express.json());
+app.use(express.static(path.join('public')));
 
-const tours = JSON.parse(fs.readFileSync(`./dev-data/data/tours-simple.json`));
-
-app.get('/api/v1/tours', (req, res) => {
-  res
-    .status(200)
-    .json({ status: 'success', results: tours.length, data: { tours } });
+app.use((req, res, next) => {
+  console.log('Hello from the middleware');
+  next();
 });
+
+app.use((req, res, next) => {
+  req.requestTime = new Date().toISOString();
+  next();
+});
+
+// routes
+app.use('/api/v1/tours', toursRouter);
+app.use('/api/v1/users', usersRouter);
 
 export default app;
