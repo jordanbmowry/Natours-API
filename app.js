@@ -1,3 +1,4 @@
+/* eslint-disable import/extensions */
 //"type": "module", in package.json allows es6 modules syntax
 import express from 'express';
 import morgan from 'morgan';
